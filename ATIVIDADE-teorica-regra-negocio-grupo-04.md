@@ -5,7 +5,7 @@
 **Data:** 18/08/2026  
 **Repositório Git:** https://github.com/Bryanlks/atividade-regra-negocio-bd
 
-Resumo Executivo
+##Resumo Executivo
 
 As regras de negócio são condições que determinam como um sistema deve funcionar de acordo com as necessidades de uma organização. Em um sistema de vendas, por exemplo, podem existir regras como impedir a venda de produtos sem estoque, exigir idade mínima para cadastro ou garantir que um CPF pertença a apenas um cliente.
 
@@ -15,19 +15,19 @@ A posição defendida neste trabalho é que não existe uma opção vencedora ab
 
 Essa abordagem evita depender exclusivamente da aplicação para garantir a integridade dos dados, mas também evita transformar o banco em um local onde toda a lógica do sistema fique concentrada. Dessa maneira, cada camada exerce uma responsabilidade adequada, proporcionando maior segurança, manutenção e flexibilidade.
 
--1. Desenvolvimento Teórico
-1.1 O que é regra de negócio?
+##1. Desenvolvimento Teórico
+###1.1 O que é regra de negócio?
 
 Uma regra de negócio é uma condição, política ou restrição que determina como uma organização realiza determinada atividade ou como um sistema deve se comportar para representar corretamente essas atividades.
 
 Por exemplo, em um sistema de vendas:
 
-um produto não pode ser vendido quando não há estoque;
-o CPF de um cliente deve ser único;
-um cliente deve possuir idade mínima para determinado cadastro;
-um pedido pode possuir determinados estados, como aberto, pago e cancelado;
-determinados produtos podem possuir descontos específicos;
-uma venda acima de determinado valor pode exigir uma autorização.
+-um produto não pode ser vendido quando não há estoque;
+-o CPF de um cliente deve ser único;
+-um cliente deve possuir idade mínima para determinado cadastro;
+-um pedido pode possuir determinados estados, como aberto, pago e cancelado;
+-determinados produtos podem possuir descontos específicos;
+-uma venda acima de determinado valor pode exigir uma autorização.
 
 As regras podem ser classificadas de diferentes maneiras.
 
@@ -37,32 +37,32 @@ São regras diretamente relacionadas à validade e consistência dos dados.
 
 Exemplos:
 
-CPF não pode ser duplicado;
-produto de um pedido deve existir;
-preço não pode ser negativo;
-determinado campo não pode ser nulo.
+-CPF não pode ser duplicado;
+-produto de um pedido deve existir;
+-preço não pode ser negativo;
+-determinado campo não pode ser nulo.
 
 Esse tipo de regra possui forte relação com o banco de dados, podendo ser implementado através de NOT NULL, UNIQUE, CHECK, PRIMARY KEY e FOREIGN KEY.
 
 O PostgreSQL disponibiliza esses mecanismos justamente para impedir que dados que violem determinadas restrições sejam armazenados.
 
-Regras de processo
+#### Regras de processo
 
 Determinam como uma operação deve acontecer.
 
 Exemplo:
 
-Um pedido só pode ser enviado depois que o pagamento for confirmado.
+> Um pedido só pode ser enviado depois que o pagamento for confirmado.
 
 Essa regra normalmente pertence à lógica da aplicação, pois envolve um fluxo de negócio.
 
-Regras de cálculo
+#### Regras de cálculo
 
 Determinam como determinados valores devem ser calculados.
 
 Exemplo:
 
-Clientes VIP recebem 15% de desconto, exceto em produtos promocionais.
+> Clientes VIP recebem 15% de desconto, exceto em produtos promocionais.
 
 Esse tipo de regra geralmente é mais adequado à camada de negócio da aplicação, principalmente quando pode sofrer alterações frequentes.
 
@@ -72,32 +72,34 @@ Determinam quem pode realizar determinada operação.
 
 Exemplo:
 
-Somente usuários com permissão de gerente podem cancelar um pedido já pago.
+> Somente usuários com permissão de gerente podem cancelar um pedido já pago.
 
 Embora o banco possa participar da proteção dos dados, a decisão de negócio normalmente deve ser coordenada pela aplicação e pelo sistema de autorização.
 
-1.2 Regras no banco de dados
+### 1.2 Regras no banco de dados
 
 O banco de dados possui mecanismos próprios para proteger a integridade das informações.
 
 Entre os principais estão:
 
-CHECK;
-NOT NULL;
-UNIQUE;
-PRIMARY KEY;
-FOREIGN KEY;
-triggers;
-procedures/functions;
-transações.
+- `CHECK`;
+- `NOT NULL`;
+- `UNIQUE`;
+- `PRIMARY KEY`;
+- `FOREIGN KEY`;
+- triggers;
+- procedures/functions;
+- transações.
 
-A documentação do PostgreSQL classifica entre suas constraints mecanismos como CHECK, NOT NULL, PRIMARY KEY, UNIQUE e FOREIGN KEY.
+A documentação do PostgreSQL classifica entre suas constraints mecanismos como `CHECK`, `NOT NULL`, `PRIMARY KEY`, `UNIQUE` e `FOREIGN KEY`.
 
-CHECK
+#### CHECK
 
 Permite determinar uma condição que o valor armazenado precisa satisfazer.
 
 Exemplo:
+
+sql
 
 CREATE TABLE produtos (
     id SERIAL PRIMARY KEY,
@@ -168,41 +170,41 @@ O PostgreSQL oferece diferentes níveis de isolamento de transações. O nível 
 
 Vantagens das regras no banco
 
-1. Proteção centralizada dos dados
+-1. Proteção centralizada dos dados
 
 Se várias aplicações utilizam o mesmo banco, uma UNIQUE, por exemplo, será aplicada independentemente de qual aplicação tentou inserir o registro.
 
-2. Maior garantia de integridade
+-2. Maior garantia de integridade
 
-A aplicação pode possuir um erro de programação, mas uma constraint continua sendo aplicada pelo banco.
+-A aplicação pode possuir um erro de programação, mas uma constraint continua sendo aplicada pelo banco.
 
-3. Controle sobre concorrência
+-3. Controle sobre concorrência
 
 O banco possui mecanismos de transação e isolamento capazes de lidar com operações concorrentes.
 
-4. Redução de duplicação para regras de integridade
+-4. Redução de duplicação para regras de integridade
 
 Uma regra como "CPF deve ser único" não precisa ser implementada separadamente em cada aplicação que acessa o banco.
 
 Desvantagens das regras no banco
 
-1. Maior acoplamento ao SGBD
+-1. Maior acoplamento ao SGBD
 
 Uma solução que depende muito de funcionalidades específicas do PostgreSQL pode ser mais difícil de migrar para outro banco.
 
-2. Manutenção mais difícil quando há lógica complexa
+-2. Manutenção mais difícil quando há lógica complexa
 
 Triggers e procedures podem tornar o comportamento do sistema menos evidente para desenvolvedores que esperam encontrar a lógica na aplicação.
 
-3. Testabilidade pode ser mais trabalhosa
+-3. Testabilidade pode ser mais trabalhosa
 
 Regras espalhadas em triggers, procedures e constraints podem exigir uma estratégia específica de testes.
 
-4. Mudanças de negócio podem exigir alterações no banco
+-4. Mudanças de negócio podem exigir alterações no banco
 
 Se uma regra muda constantemente, manter essa lógica dentro do banco pode tornar a evolução mais trabalhosa.
 
-1.3 Regras na aplicação
+### 1.3 Regras na aplicação
 
 Na aplicação, as regras de negócio normalmente ficam em uma camada de serviço ou domínio.
 
@@ -245,11 +247,11 @@ Nesse caso, a aplicação está verificando diversas regras antes de executar a 
 
 Vantagens das regras na aplicação
 
-1. Maior flexibilidade
+-1. Maior flexibilidade
 
 Alterações nas regras podem ser realizadas no código sem necessariamente modificar a estrutura do banco.
 
-2. Melhor organização para regras complexas
+-2. Melhor organização para regras complexas
 
 Regras que envolvem vários passos, cálculos ou decisões podem ser mais fáceis de compreender em uma linguagem de programação.
 
@@ -257,13 +259,13 @@ Regras que envolvem vários passos, cálculos ou decisões podem ser mais fácei
 
 É possível criar testes unitários para diferentes cenários da regra de negócio.
 
-4. Melhor integração com outras partes do sistema
+-4. Melhor integração com outras partes do sistema
 
 A aplicação pode combinar informações vindas do banco, APIs externas, serviços de pagamento e outros componentes.
 
 Desvantagens das regras na aplicação
 
-1. Risco de inconsistência entre diferentes aplicações
+-1. Risco de inconsistência entre diferentes aplicações
 
 Imagine que um banco seja utilizado por:
 
@@ -274,7 +276,7 @@ API de Parceiros
 
 Se cada aplicação implementar a mesma regra de maneira diferente, podem surgir inconsistências.
 
-2. O banco pode receber dados sem passar pela regra
+-2. O banco pode receber dados sem passar pela regra
 
 Se alguém executar diretamente:
 
@@ -282,11 +284,11 @@ INSERT INTO clientes (...)
 
 a regra existente apenas na aplicação pode ser ignorada.
 
-3. Duplicação
+-3. Duplicação
 
 Uma mesma regra pode acabar sendo implementada em vários serviços.
 
-4. Problemas de concorrência
+-4. Problemas de concorrência
 
 Uma simples validação na aplicação pode não ser suficiente quando duas requisições acontecem simultaneamente.
 
@@ -309,7 +311,7 @@ Desempenho	Pode ser excelente para validações próximas aos dados	Pode evitar 
 
 Portanto, não se trata simplesmente de escolher "banco" ou "aplicação". O mais importante é determinar qual camada possui a responsabilidade mais adequada para cada tipo de regra.
 
-1.5 Análise crítica: qual a melhor opção?
+### 1.5 Análise crítica: qual a melhor opção?
 
 A análise dos dois modelos mostra que não existe uma solução universal.
 
@@ -406,8 +408,9 @@ CHECK
 costuma ser uma decisão de baixo custo e alto benefício.
 
 
--2. Exemplos e Casos
-2.1 Exemplo em PostgreSQL: regra no banco
+## 2. Exemplos e Casos
+
+### 2.1 Exemplo em PostgreSQL: regra no banco
 
 Considere um sistema de vendas.
 
@@ -459,7 +462,7 @@ CHECK restringe valores inválidos.
 
 Essas são exatamente as situações para as quais as constraints do PostgreSQL são destinadas.
 
-2.2 Regra de negócio na aplicação
+### 2.2 Regra de negócio na aplicação
 
 Agora considere a seguinte regra:
 
@@ -502,7 +505,7 @@ As duas podem passar pela validação antes que qualquer uma delas perceba a alt
 
 Nesse tipo de situação, a implementação precisa considerar mecanismos de concorrência e transação do banco. O PostgreSQL documenta diferentes níveis de isolamento justamente para controlar efeitos de transações concorrentes.
 
-2.3 Caso realista: sistema de vendas
+### 2.3 Caso realista: sistema de vendas
 
 Considere uma empresa que possui:
 
@@ -557,7 +560,7 @@ Banco
 
 Essa separação também está alinhada à ideia de separar a lógica de domínio da camada de acesso aos dados. Fowler descreve arquiteturas em camadas nas quais apresentação, lógica de domínio e acesso a dados possuem responsabilidades distintas.
 
--3. Referências
+## 3. Referências
 PostgreSQL Global Development Group. PostgreSQL Documentation — Constraints. Disponível em: PostgreSQL Documentation — Constraints. Acesso em: 18 ago. 2026.
 PostgreSQL Global Development Group. PostgreSQL Documentation — Transaction Isolation. Disponível em: PostgreSQL Documentation — Transaction Isolation. Acesso em: 18 ago. 2026.
 PostgreSQL Global Development Group. PostgreSQL Documentation — Transaction Processing. Disponível em: PostgreSQL Documentation — Transaction Processing. Acesso em: 18 ago. 2026.
@@ -565,7 +568,7 @@ FOWLER, Martin. Domain Logic and SQL. Disponível em: Martin Fowler — Domain L
 FOWLER, Martin. Service Layer. Disponível em: Martin Fowler — Service Layer. Acesso em: 18 ago. 2026.
 FOWLER, Martin. Patterns of Enterprise Application Architecture. Addison-Wesley, 2002.
 
-4. Conclusões
+## 4. Conclusões
 
 A análise realizada demonstra que não é adequado considerar banco de dados e aplicação como alternativas mutuamente exclusivas.
 
