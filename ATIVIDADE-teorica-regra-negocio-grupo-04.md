@@ -556,3 +556,11 @@ Banco
 → impede o dado inválido
 
 Essa separação também está alinhada à ideia de separar a lógica de domínio da camada de acesso aos dados. Fowler descreve arquiteturas em camadas nas quais apresentação, lógica de domínio e acesso a dados possuem responsabilidades distintas.
+
+-3. Referências
+PostgreSQL Global Development Group. PostgreSQL Documentation — Constraints. Disponível em: PostgreSQL Documentation — Constraints. Acesso em: 18 ago. 2026.
+PostgreSQL Global Development Group. PostgreSQL Documentation — Transaction Isolation. Disponível em: PostgreSQL Documentation — Transaction Isolation. Acesso em: 18 ago. 2026.
+PostgreSQL Global Development Group. PostgreSQL Documentation — Transaction Processing. Disponível em: PostgreSQL Documentation — Transaction Processing. Acesso em: 18 ago. 2026.
+FOWLER, Martin. Domain Logic and SQL. Disponível em: Martin Fowler — Domain Logic and SQL. Acesso em: 18 ago. 2026.
+FOWLER, Martin. Service Layer. Disponível em: Martin Fowler — Service Layer. Acesso em: 18 ago. 2026.
+FOWLER, Martin. Patterns of Enterprise Application Architecture. Addison-Wesley, 2002.
