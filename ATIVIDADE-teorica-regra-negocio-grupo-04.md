@@ -15,7 +15,7 @@ A posição defendida neste trabalho é que não existe uma opção vencedora ab
 
 Essa abordagem evita depender exclusivamente da aplicação para garantir a integridade dos dados, mas também evita transformar o banco em um local onde toda a lógica do sistema fique concentrada. Dessa maneira, cada camada exerce uma responsabilidade adequada, proporcionando maior segurança, manutenção e flexibilidade.
 
-1. Desenvolvimento Teórico
+-1. Desenvolvimento Teórico
 1.1 O que é regra de negócio?
 
 Uma regra de negócio é uma condição, política ou restrição que determina como uma organização realiza determinada atividade ou como um sistema deve se comportar para representar corretamente essas atividades.
@@ -404,3 +404,155 @@ FOREIGN KEY
 CHECK
 
 costuma ser uma decisão de baixo custo e alto benefício.
+
+
+-2. Exemplos e Casos
+2.1 Exemplo em PostgreSQL: regra no banco
+
+Considere um sistema de vendas.
+
+As regras são:
+
+Todo cliente deve possuir CPF.
+O CPF deve ser único.
+Todo pedido deve estar associado a um cliente existente.
+O preço de um produto deve ser positivo.
+A quantidade de estoque não pode ser negativa.
+
+Podemos representar essas regras da seguinte maneira:
+
+CREATE TABLE clientes (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(11) NOT NULL UNIQUE
+);
+
+
+CREATE TABLE produtos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    preco NUMERIC(10,2) NOT NULL CHECK (preco > 0),
+    estoque INTEGER NOT NULL CHECK (estoque >= 0)
+);
+
+
+CREATE TABLE pedidos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INTEGER NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'ABERTO',
+
+
+    FOREIGN KEY (cliente_id)
+        REFERENCES clientes(id),
+
+
+    CHECK (status IN ('ABERTO', 'PAGO', 'CANCELADO'))
+);
+
+Nesse exemplo:
+
+PRIMARY KEY identifica cada registro;
+NOT NULL impede valores ausentes;
+UNIQUE impede CPFs duplicados;
+FOREIGN KEY garante a existência do cliente;
+CHECK restringe valores inválidos.
+
+Essas são exatamente as situações para as quais as constraints do PostgreSQL são destinadas.
+
+2.2 Regra de negócio na aplicação
+
+Agora considere a seguinte regra:
+
+Um cliente não pode criar um novo pedido enquanto possuir outro pedido aberto.
+
+Essa regra pode envolver uma consulta e uma decisão de negócio.
+
+Um pseudocódigo seria:
+
+function criarPedido(clienteId) {
+
+
+    const pedidoAberto = buscarPedidoAberto(clienteId);
+
+
+    if (pedidoAberto) {
+        throw new Error(
+            "O cliente já possui um pedido em aberto."
+        );
+    }
+
+
+    return criarNovoPedido(clienteId);
+}
+
+A aplicação pode ser responsável por essa decisão porque ela faz parte do fluxo de negócio.
+
+Entretanto, se essa regra for realmente uma garantia de integridade que precisa ser respeitada sob concorrência, simplesmente consultar antes de inserir pode não ser suficiente.
+
+Imagine duas requisições simultâneas:
+
+Requisição A → verifica → nenhum pedido aberto
+Requisição B → verifica → nenhum pedido aberto
+
+
+Requisição A → cria pedido
+Requisição B → cria pedido
+
+As duas podem passar pela validação antes que qualquer uma delas perceba a alteração da outra.
+
+Nesse tipo de situação, a implementação precisa considerar mecanismos de concorrência e transação do banco. O PostgreSQL documenta diferentes níveis de isolamento justamente para controlar efeitos de transações concorrentes.
+
+2.3 Caso realista: sistema de vendas
+
+Considere uma empresa que possui:
+
+                ┌── Site
+                │
+Cliente ────────┼── Aplicativo
+                │
+                ├── Sistema interno
+                │
+                └── API
+                       │
+                       ↓
+                  PostgreSQL
+
+A empresa possui a regra:
+
+CPF deve ser único.
+
+Se essa regra estiver somente no site, o aplicativo poderá cadastrar o mesmo CPF.
+
+Uma solução melhor é:
+
+Aplicação
+
+Verificar previamente:
+
+if (cpfJaExiste(cpf)) {
+    return "CPF já cadastrado";
+}
+
+Isso melhora a experiência do usuário.
+
+Banco
+
+Manter:
+
+cpf VARCHAR(11) UNIQUE NOT NULL
+
+Isso garante a integridade mesmo que outra aplicação tente inserir o mesmo CPF.
+
+Portanto, as duas camadas podem trabalhar juntas, mas possuem responsabilidades diferentes:
+
+Aplicação
+→ valida antecipadamente
+→ informa o usuário
+→ controla o fluxo
+
+
+Banco
+→ garante a integridade
+→ impede o dado inválido
+
+Essa separação também está alinhada à ideia de separar a lógica de domínio da camada de acesso aos dados. Fowler descreve arquiteturas em camadas nas quais apresentação, lógica de domínio e acesso a dados possuem responsabilidades distintas.
