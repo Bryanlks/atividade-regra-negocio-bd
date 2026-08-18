@@ -564,3 +564,57 @@ PostgreSQL Global Development Group. PostgreSQL Documentation — Transaction Pr
 FOWLER, Martin. Domain Logic and SQL. Disponível em: Martin Fowler — Domain Logic and SQL. Acesso em: 18 ago. 2026.
 FOWLER, Martin. Service Layer. Disponível em: Martin Fowler — Service Layer. Acesso em: 18 ago. 2026.
 FOWLER, Martin. Patterns of Enterprise Application Architecture. Addison-Wesley, 2002.
+
+4. Conclusões
+
+A análise realizada demonstra que não é adequado considerar banco de dados e aplicação como alternativas mutuamente exclusivas.
+
+O banco de dados possui uma responsabilidade fundamental na proteção da integridade dos dados. Regras como unicidade, obrigatoriedade, integridade referencial e limites simples de valores são exemplos que devem ser protegidos por constraints sempre que possível.
+
+Por outro lado, a aplicação é mais adequada para regras relacionadas ao comportamento do sistema, especialmente quando envolvem fluxos, cálculos complexos, integrações externas, autorização e políticas comerciais que podem sofrer alterações frequentes.
+
+Uma conclusão importante é que a aplicação não deve ser considerada a única responsável pela consistência dos dados. Se uma regra fundamental existir somente no código, qualquer outra aplicação ou processo que acesse o banco poderá potencialmente violá-la.
+
+Da mesma forma, colocar toda a lógica de negócio no banco também não é uma solução ideal. Isso pode aumentar o acoplamento com o SGBD e dificultar a manutenção de regras complexas.
+
+Assim, a posição do grupo é a favor de uma arquitetura híbrida, na qual cada camada possui responsabilidades bem definidas:
+
+O banco deve garantir a integridade dos dados; a aplicação deve coordenar e implementar a lógica de negócio complexa.
+
+Por exemplo, no sistema de vendas:
+
+CPF único
+        ↓
+Banco de dados → UNIQUE
+
+
+Cliente existente
+        ↓
+Banco de dados → FOREIGN KEY
+
+
+Preço válido
+        ↓
+Banco de dados → CHECK
+
+
+Desconto para cliente VIP
+        ↓
+Aplicação → Regra de negócio
+
+
+Fluxo de pagamento
+        ↓
+Aplicação → Serviço de negócio
+
+
+Concorrência e consistência
+        ↓
+Banco + Transações
+
+
+Experiência e mensagens ao usuário
+        ↓
+Aplicação
+
+Portanto, a melhor arquitetura não consiste em escolher exclusivamente entre banco ou aplicação, mas em atribuir cada responsabilidade à camada mais adequada, evitando tanto a fragilidade de depender somente da aplicação quanto o excesso de lógica dentro do banco.
