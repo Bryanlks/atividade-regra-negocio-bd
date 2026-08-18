@@ -22,12 +22,17 @@ Uma regra de negócio é uma condição, política ou restrição que determina 
 
 Por exemplo, em um sistema de vendas:
 
--um produto não pode ser vendido quando não há estoque;
--o CPF de um cliente deve ser único;
--um cliente deve possuir idade mínima para determinado cadastro;
--um pedido pode possuir determinados estados, como aberto, pago e cancelado;
--determinados produtos podem possuir descontos específicos;
--uma venda acima de determinado valor pode exigir uma autorização.
+- um produto não pode ser vendido quando não há estoque;
+
+- o CPF de um cliente deve ser único;
+
+- um cliente deve possuir idade mínima para determinado cadastro;
+
+- um pedido pode possuir determinados estados, como aberto, pago e cancelado;
+
+- determinados produtos podem possuir descontos específicos;
+
+- uma venda acima de determinado valor pode exigir uma autorização.
 
 As regras podem ser classificadas de diferentes maneiras.
 
@@ -37,10 +42,10 @@ São regras diretamente relacionadas à validade e consistência dos dados.
 
 Exemplos:
 
--CPF não pode ser duplicado;
--produto de um pedido deve existir;
--preço não pode ser negativo;
--determinado campo não pode ser nulo.
+- CPF não pode ser duplicado;
+- produto de um pedido deve existir;
+- preço não pode ser negativo;
+- determinado campo não pode ser nulo.
 
 Esse tipo de regra possui forte relação com o banco de dados, podendo ser implementado através de NOT NULL, UNIQUE, CHECK, PRIMARY KEY e FOREIGN KEY.
 
@@ -170,37 +175,37 @@ O PostgreSQL oferece diferentes níveis de isolamento de transações. O nível 
 
 Vantagens das regras no banco
 
--1. Proteção centralizada dos dados
+- 1. Proteção centralizada dos dados
 
 Se várias aplicações utilizam o mesmo banco, uma UNIQUE, por exemplo, será aplicada independentemente de qual aplicação tentou inserir o registro.
 
--2. Maior garantia de integridade
+- 2. Maior garantia de integridade
 
--A aplicação pode possuir um erro de programação, mas uma constraint continua sendo aplicada pelo banco.
+A aplicação pode possuir um erro de programação, mas uma constraint continua sendo aplicada pelo banco.
 
--3. Controle sobre concorrência
+- 3. Controle sobre concorrência
 
 O banco possui mecanismos de transação e isolamento capazes de lidar com operações concorrentes.
 
--4. Redução de duplicação para regras de integridade
+- 4. Redução de duplicação para regras de integridade
 
 Uma regra como "CPF deve ser único" não precisa ser implementada separadamente em cada aplicação que acessa o banco.
 
 Desvantagens das regras no banco
 
--1. Maior acoplamento ao SGBD
+- 1. Maior acoplamento ao SGBD
 
 Uma solução que depende muito de funcionalidades específicas do PostgreSQL pode ser mais difícil de migrar para outro banco.
 
--2. Manutenção mais difícil quando há lógica complexa
+- 2. Manutenção mais difícil quando há lógica complexa
 
 Triggers e procedures podem tornar o comportamento do sistema menos evidente para desenvolvedores que esperam encontrar a lógica na aplicação.
 
--3. Testabilidade pode ser mais trabalhosa
+- 3. Testabilidade pode ser mais trabalhosa
 
 Regras espalhadas em triggers, procedures e constraints podem exigir uma estratégia específica de testes.
 
--4. Mudanças de negócio podem exigir alterações no banco
+- 4. Mudanças de negócio podem exigir alterações no banco
 
 Se uma regra muda constantemente, manter essa lógica dentro do banco pode tornar a evolução mais trabalhosa.
 
@@ -247,25 +252,25 @@ Nesse caso, a aplicação está verificando diversas regras antes de executar a 
 
 Vantagens das regras na aplicação
 
--1. Maior flexibilidade
+- 1. Maior flexibilidade
 
 Alterações nas regras podem ser realizadas no código sem necessariamente modificar a estrutura do banco.
 
--2. Melhor organização para regras complexas
+- 2. Melhor organização para regras complexas
 
 Regras que envolvem vários passos, cálculos ou decisões podem ser mais fáceis de compreender em uma linguagem de programação.
 
-3. Facilidade de testes automatizados
+- 3. Facilidade de testes automatizados
 
 É possível criar testes unitários para diferentes cenários da regra de negócio.
 
--4. Melhor integração com outras partes do sistema
+- 4. Melhor integração com outras partes do sistema
 
 A aplicação pode combinar informações vindas do banco, APIs externas, serviços de pagamento e outros componentes.
 
 Desvantagens das regras na aplicação
 
--1. Risco de inconsistência entre diferentes aplicações
+- 1. Risco de inconsistência entre diferentes aplicações
 
 Imagine que um banco seja utilizado por:
 
@@ -276,7 +281,7 @@ API de Parceiros
 
 Se cada aplicação implementar a mesma regra de maneira diferente, podem surgir inconsistências.
 
--2. O banco pode receber dados sem passar pela regra
+- 2. O banco pode receber dados sem passar pela regra
 
 Se alguém executar diretamente:
 
@@ -284,30 +289,30 @@ INSERT INTO clientes (...)
 
 a regra existente apenas na aplicação pode ser ignorada.
 
--3. Duplicação
+- 3. Duplicação
 
 Uma mesma regra pode acabar sendo implementada em vários serviços.
 
--4. Problemas de concorrência
+- 4. Problemas de concorrência
 
 Uma simples validação na aplicação pode não ser suficiente quando duas requisições acontecem simultaneamente.
 
 Por isso, determinadas garantias devem ser realizadas pelo próprio banco.
 
-1.4 Comparativo BD x Aplicação
-Critério	Banco de Dados	Aplicação
-Integridade dos dados	Excelente	Depende da aplicação
-Unicidade	Excelente com UNIQUE	Precisa de controle adicional
-Integridade referencial	Excelente com FOREIGN KEY	Mais trabalhosa
-Regras complexas	Pode ficar difícil de manter	Mais adequada
-Regras que mudam frequentemente	Menos conveniente	Mais conveniente
-Concorrência	Forte suporte através de transações	Depende do uso correto do banco
-Testes unitários	Mais trabalhosos	Mais simples
-Portabilidade	Pode diminuir com recursos específicos do SGBD	Geralmente maior
-Centralização	Alta	Pode ser baixa em sistemas distribuídos
-Experiência do usuário	Limitada	Excelente para mensagens e fluxos
-Segurança da integridade	Muito alta	Depende do acesso ao banco
-Desempenho	Pode ser excelente para validações próximas aos dados	Pode evitar operações desnecessárias, dependendo do caso
+### 1.4 Comparativo BD x Aplicação
+Critério	                        Banco de Dados	                                            Aplicação
+Integridade dos dados	            Excelente	                                                Depende da aplicação
+Unicidade	                        Excelente com UNIQUE	                                    Precisa de controle adicional
+Integridade referencial	            Excelente com FOREIGN KEY	                                Mais trabalhosa
+Regras complexas	                Pode ficar difícil de manter	                            Mais adequada
+Regras que mudam frequentemente	    Menos conveniente	                                        Mais conveniente
+Concorrência	                    Forte suporte através de transações	                        Depende do uso correto do banco
+Testes unitários	                Mais trabalhosos	                                        Mais simples
+Portabilidade	                    Pode diminuir com recursos específicos do SGBD	            Geralmente maior
+Centralização	                    Alta	                                                    Pode ser baixa em sistemas distribuídos
+Experiência do usuário	            Limitada	                                                Excelente para mensagens e fluxos
+Segurança da integridade	        Muito alta	                                                Depende do acesso ao banco
+Desempenho	                        Pode ser excelente para validações próximas aos dados	    Pode evitar operações desnecessárias, dependendo do caso
 
 Portanto, não se trata simplesmente de escolher "banco" ou "aplicação". O mais importante é determinar qual camada possui a responsabilidade mais adequada para cada tipo de regra.
 
